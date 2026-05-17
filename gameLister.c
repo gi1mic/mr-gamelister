@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     int rc = sqlite3_open(dbFile, &db);
 
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "Unable to open database 'media.db': %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "Unable to open database %s : %s\n", dbFile, sqlite3_errmsg(db));
         if (db) {
             sqlite3_close(db);
         }
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "Failed to prepare SQL statement: %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "Failed to prepare SQL statement: %s in database %s\n", sqlite3_errmsg(db), dbFile);
         sqlite3_close(db);
         return 1;
     }
