@@ -2,10 +2,16 @@
 // lists game names in the format "SystemName-GameName.jpg".
 // Make sure to update your zaproo media database before running this program to ensure it has the latest game information!
 //
-// Usage: gameLister.exe [path_to_database]
+// Usage: gameLister [path_to_database]
 //
-// Compile the code with: gcc gameLister.c -lsqlite3 -o gameLister.exe
+// Compile the code under Ubuntu: gcc gameLister.c -lsqlite3 -o gameLister
 // Insure to install the SQLite3 development libraries i.e. apt install sqlite3 libsqlite3-dev
+//
+// To compile for MiSTer, you can use the following:
+// apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+// Then download the SQLITE3 source code and compile it.
+// finally compile the application with:
+//     arm-none-eabi-gcc -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -std=c17 -O2 gameLister.c -lsqlite3 -o gameLister
 
 
 #include <stdio.h>
@@ -19,10 +25,10 @@ int main(int argc, char *argv[]) {
     const char *dbFile = (argc >= 2) ? argv[1] : "media.db";
     
     const char *sql = "SELECT s.Name, m.Path FROM Media m JOIN Systems s ON m.SystemDBID = s.DBID ORDER BY s.Name, m.Path;";
-    int rc = sqlite3_open(dbFile, &db);
+    int rc = sqlite3_open_v2(dbFile, &db, SQLITE_OPEN_READONLY, NULL);
 
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "Unable to open database %s : %s\n", dbFile, sqlite3_errmsg(db));
+        fprintf(stderr, "Unable to open database %s in read-only mode: %s\n", dbFile, sqlite3_errmsg(db));
         if (db) {
             sqlite3_close(db);
         }
